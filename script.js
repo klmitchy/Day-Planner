@@ -14,9 +14,11 @@ var currentTime = moment().hours();
 
 var saveActivity = $(".saveBtn")
 
-$(".saveBtn")onabort("click", function() {
+$(".saveBtn")("click", function() {
  
     var textValue = $(this).siblings("color-block".value)
 
 })
 
+//save to local storage:
+window.localStorage.setItem("","");
