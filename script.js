@@ -1,24 +1,29 @@
 
-//set current day and time in header
-var todaysDate = $("#currentDay");
+// //set current day and time in header
+// var todaysDate = $("#currentDay");
+// var todaysDate= moment().format('dddd MMMM Do YYYY');
+// $("currentDay").text(todaysDate);
+// var saveActivity = $(".saveBtn")
 
-var todaysDate= moment().format('dddd MMMM Do YYYY');
-$("currentDay").text(todaysDate);
 
 
-//grab current hour of day to determine past, present, future:
+$(init);
 
-var currentTime = moment().hours();
+function init() {
+  // get current day and display on top of page
+  $("#currentDay").text(moment().format("dddd, MMMM Do"));
 
-//add evvent listener for save button:
+  // //grab current hour of day to determine past, present, future:
+  colorTimeBlocks();
+  setInterval(colorTimeBlocks, 60000);
 
-var saveActivity = $(".saveBtn")
+  
+  $(".time-block").each(function() {
+    var blockId = $(this).attr("id");
+    // load saved data from local storage
+    $("#" + blockId + " textarea").text(localStorage.getItem(moment().format("DDDYYYY") + blockId));
+  });
 
-$(".saveBtn")("click", function() {
- 
-    var textValue = $(this).siblings("color-block".value)
-
-})
-
-//save to local storage:
-window.localStorage.setItem("","");
+// //add evvent listener for save button:
+  $(".saveBtn").on("click", handleSave);
+}
