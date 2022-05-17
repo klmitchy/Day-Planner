@@ -6,51 +6,55 @@
 // var saveActivity = $(".saveBtn")
 
 
-$(init);
+  // -------- CURRENT DAY -------- \\
+$('#currentDay').text(moment().format('[Today\'s Date: ]dddd, MMMM Do, YYYY'));
 
-function init() {
-  // get current day and display on top of page
-  $("#currentDay").text(moment().format("dddd, MMMM Do"));
+// -------- TIME BLOCK RENDERING -------- \\
+$(function renderTextArea() {
+    let timeBlockRows = $('.row');
+    let currentTime = Number(moment().format('H'));
 
-  // //grab current hour of day to determine past, present, future:
-  
-  $(".time-block").each(function() {
-    var blockId = $(this).attr("id");
-    // load saved data from local storage
-    $("#" + blockId + " textarea").text(localStorage.getItem(moment().format("DDDYYYY") + blockId));
-  });
+    timeBlockRows.each(function (i) {
+        let rowText = $(this).children('textarea');
+        let storedText = JSON.parse(localStorage.getItem('row ' + i))
 
-// //add evvent listener for save button:
-  $(".saveBtn").on("click", handleSave);
-}
+        // adjust background color depending on current time
+        if (currentTime === $(this).data('time')) {
+            $(this).children('textarea').addClass('present');
+            $(this).prevAll().children('textarea').addClass('past');
+            $(this).nextAll().children('textarea').addClass('future');
+        }
+        
+        // validate if there is any saved text
+        if (storedText === null) {
+            return;
+        }
 
-function colorTimeBlocks() {
-  // for each time block
-  $(".time-block").each(function() {
-    var blockHour = parseInt($(this).attr("id").replace("hour-", ""));
-    var currentHour = parseInt(moment().format("H"));
-    // remove any class we may have added before
-    $(this).removeClass("past present future");
-    // color block based on past, present, future class
-    if (blockHour < currentHour) {
-      $(this).addClass("past");
-    } else if (blockHour > currentHour) {
-      $(this).addClass("future");
-    } else {
-      $(this).addClass("present");
+        // set value as saved text
+        rowText.val(storedText);
+    });
+
+    if (currentTime < 9) {
+        // set background to green if before 9 AM
+        $('.container').find('textarea').addClass('future');
+
+    } else if (currentTime > 17) {
+        // set background to gray if after 5 PM
+        $('.container').find('textarea').addClass('past');
     }
-  });
-}
+});
 
-colorTimeBlocks();
-setInterval(colorTimeBlocks, 60000);
-// //save to local storage:
-// window.localStorage.setItem("","");
-function handleSave(event) {
-  // get the id of our parent
-  var hourId = $(this).parent().attr("id");
-  // save data in local storage
-  localStorage.setItem(moment().format("DDDYYYY") + hourId, $("#" + hourId + " textarea").val());
-}
+// -------- SAVE BUTTON --------\\
+$('.saveBtn').on('click', function () {
+    let textArea = $(this).siblings('textarea').val();
+    let rowIndex = $(this).parent().data('index');
+    let textValue = textArea;
 
-// var textValue = $(this).siblings("color-block".value)
+    localStorage.setItem('row ' + rowIndex, JSON.stringify(textValue));
+})
+
+
+$('.clearBtn').on('click', function () {
+    localStorage.clear();
+    location.reload();
+})
